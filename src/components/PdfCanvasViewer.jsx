@@ -49,7 +49,7 @@ export default function PdfCanvasViewer({ url, className = '' }) {
     setStatus('loading')
 
     loadPdfjs()
-      .then((pdfjsLib) => pdfjsLib.getDocument(url).promise)
+      .then((pdfjsLib) => pdfjsLib.getDocument({ url }).promise)
       .then((pdf) => {
         if (cancelled) {
           pdf.destroy()

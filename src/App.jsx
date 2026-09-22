@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import PdfModal from './components/PdfModal'
 import { loadPdfjs } from './components/PdfCanvasViewer'
 import ErrorDialog from './components/ErrorDialog'
+import { triggerFileDownload } from './lib/download'
 import { config } from './config'
 import { corePhoneDigits, phonesMatch } from './lib/phone'
 import { getPhoneFromUrl, trackDownloaded, trackOpened } from './lib/tracking'
@@ -105,7 +106,7 @@ function App() {
 
   const triggerDownload = () => {
     handleDownload()
-    window.open(config.pdfUrl, '_blank', 'noopener')
+    triggerFileDownload(config.pdfUrl, config.pdfFileName)
   }
 
   if (!verified) {

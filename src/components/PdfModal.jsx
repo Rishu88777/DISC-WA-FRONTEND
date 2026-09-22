@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PdfCanvasViewer from './PdfCanvasViewer'
+import { triggerFileDownload } from '../lib/download'
 
 const DownloadIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -38,10 +39,10 @@ export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitl
   const handleDownload = () => {
     // Fire tracking first (sendBeacon survives the navigation below, even in a
     // WhatsApp in-app WebView that hands the actual file save off to the system
-    // browser) — then open the file so the browser/webview can save it.
+    // browser) — then trigger the actual save.
     onDownload?.()
     setDownloading(true)
-    window.open(pdfUrl, '_blank', 'noopener')
+    triggerFileDownload(pdfUrl, fileName)
     setTimeout(() => setDownloading(false), 900)
   }
 

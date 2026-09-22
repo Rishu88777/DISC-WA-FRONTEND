@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PdfModal from './components/PdfModal'
 import { loadPdfjs } from './components/PdfCanvasViewer'
+import ErrorDialog from './components/ErrorDialog'
 import { config } from './config'
 import { corePhoneDigits, phonesMatch } from './lib/phone'
 import { getPhoneFromUrl, trackDownloaded, trackOpened } from './lib/tracking'
@@ -147,11 +148,6 @@ function App() {
                     : 'border-slate-300 focus:border-slate-400 focus:ring-slate-100'
                 }`}
               />
-              {verifyError && (
-                <p className="mt-2 text-xs font-medium text-red-600">
-                  That number doesn't match this link. Please double-check and try again.
-                </p>
-              )}
             </div>
 
             <button
@@ -167,6 +163,13 @@ function App() {
             Having trouble? Reply to the WhatsApp message and we'll help you out.
           </p>
         </div>
+
+        <ErrorDialog
+          open={verifyError}
+          title="That number doesn't match"
+          message="The mobile number you entered doesn't match the recipient of this link. Please double-check and try again."
+          onClose={() => setVerifyError(false)}
+        />
       </div>
     )
   }

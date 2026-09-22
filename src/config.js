@@ -8,7 +8,7 @@ export const config = {
   // See google-apps-script/Code.gs for the script and README.md for deployment steps.
   trackingApiUrl:
     import.meta.env.VITE_TRACKING_API_URL ||
-    'https://script.google.com/macros/s/AKfycbzDFjOZuN2NVvaL-9EMTIHXzIJoiXxAOP65wo6Lte-DnkRWrr-6MD93hD41kUJlEW3W/exec',
+    'https://script.google.com/macros/s/AKfycbzPGEmp-yDdmPJWOyRhs7XjEE0cOqU3Hjys0pfuZEiPHMxnXz0VKY9diXUf4TBNMZgQ/exec',
 
   // The PDF that gets previewed and downloaded. Lives in /public.
   pdfUrl: import.meta.env.VITE_PDF_URL || '/DICS_Admission_Notice.pdf',

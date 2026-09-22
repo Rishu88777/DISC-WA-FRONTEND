@@ -17,6 +17,10 @@
 
 const SHEET_NAME = 'Tracking'
 
+function doPost(e) {
+  return doGet(e)
+}
+
 function doGet(e) {
   const params = (e && e.parameter) || {}
   const action = params.action

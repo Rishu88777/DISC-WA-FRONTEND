@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import PdfCanvasViewer from './PdfCanvasViewer'
 
 const DownloadIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -22,7 +23,6 @@ const CheckIcon = (props) => (
 )
 
 export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitle, onDownload, downloaded }) {
-  const [iframeLoaded, setIframeLoaded] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
@@ -35,20 +35,14 @@ export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitl
 
   if (!open) return null
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
+    // Fire tracking first (sendBeacon survives the navigation below, even in a
+    // WhatsApp in-app WebView that hands the actual file save off to the system
+    // browser) — then open the file so the browser/webview can save it.
+    onDownload?.()
     setDownloading(true)
-    try {
-      await onDownload?.()
-
-      const link = document.createElement('a')
-      link.href = pdfUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    } finally {
-      setDownloading(false)
-    }
+    window.open(pdfUrl, '_blank', 'noopener')
+    setTimeout(() => setDownloading(false), 900)
   }
 
   return (
@@ -79,19 +73,8 @@ export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitl
         </div>
 
         {/* PDF preview */}
-        <div className="pdf-scroll relative flex-1 overflow-auto bg-slate-100">
-          {!iframeLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-500" />
-              <p className="text-sm">Loading document…</p>
-            </div>
-          )}
-          <iframe
-            title={documentTitle}
-            src={`${pdfUrl}#toolbar=0`}
-            onLoad={() => setIframeLoaded(true)}
-            className={`h-full w-full border-0 transition-opacity duration-300 ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
-          />
+        <div className="pdf-scroll relative flex-1 overflow-hidden bg-slate-100">
+          <PdfCanvasViewer url={pdfUrl} />
         </div>
 
         {/* Footer / Download bar */}
@@ -105,7 +88,7 @@ export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitl
             {downloading ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                Preparing download…
+                Opening download…
               </>
             ) : downloaded ? (
               <>
@@ -120,7 +103,7 @@ export default function PdfModal({ open, onClose, pdfUrl, fileName, documentTitl
             )}
           </button>
           <p className="mt-2.5 text-center text-xs text-slate-400">
-            If the preview above doesn't load, tap Download to save the file to your device.
+            If you're inside WhatsApp, this may briefly open your regular browser to save the file.
           </p>
         </div>
       </div>

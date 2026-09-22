@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import PdfModal from './components/PdfModal'
+import { loadPdfjs } from './components/PdfCanvasViewer'
 import { config } from './config'
+import { corePhoneDigits, phonesMatch } from './lib/phone'
 import { getPhoneFromUrl, trackDownloaded, trackOpened } from './lib/tracking'
 
 const DocumentIcon = (props) => (
@@ -29,55 +31,152 @@ const AlertIcon = (props) => (
   </svg>
 )
 
+const LockIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="3" y="11" width="18" height="11" rx="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+)
+
+function Brand() {
+  return (
+    <div className="mb-8 flex items-center gap-2.5">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white">
+        <span className="text-sm font-bold">
+          {config.companyName
+            .split(' ')
+            .map((w) => w[0])
+            .join('')
+            .slice(0, 2)}
+        </span>
+      </div>
+      <span className="text-sm font-semibold tracking-wide text-slate-700">{config.companyName}</span>
+    </div>
+  )
+}
+
 function App() {
-  const [phone, setPhone] = useState(null)
+  const [urlPhone] = useState(() => getPhoneFromUrl())
+  // No phone to verify against — there's nothing to gate, so start unlocked.
+  const [verified, setVerified] = useState(() => urlPhone === null)
+  const [enteredPhone, setEnteredPhone] = useState('')
+  const [verifyError, setVerifyError] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const hasLoggedOpen = useRef(false)
+
+  const missingUrlPhone = urlPhone === null
 
   useEffect(() => {
     document.title = `${config.documentTitle} — ${config.companyName}`
   }, [])
 
   useEffect(() => {
-    const detectedPhone = getPhoneFromUrl()
-    setPhone(detectedPhone)
-
-    if (detectedPhone && !hasLoggedOpen.current) {
+    if (urlPhone && !hasLoggedOpen.current) {
       hasLoggedOpen.current = true
-      trackOpened(detectedPhone)
+      trackOpened(urlPhone)
     }
+  }, [urlPhone])
 
-    // Auto-open the PDF preview shortly after load, like a WhatsApp CTA "reveal".
-    const timer = setTimeout(() => setModalOpen(true), 450)
+  useEffect(() => {
+    if (!verified) return
+    // Warm up the pdf.js chunk as soon as we're unlocked so the auto-opened
+    // modal below doesn't sit on a blank loading state.
+    loadPdfjs()
+    const timer = setTimeout(() => setModalOpen(true), 400)
     return () => clearTimeout(timer)
-  }, [])
+  }, [verified])
 
-  const handleDownload = async () => {
-    await trackDownloaded(phone)
+  const handleVerify = (e) => {
+    e.preventDefault()
+    if (phonesMatch(enteredPhone, urlPhone)) {
+      setVerifyError(false)
+      setVerified(true)
+    } else {
+      setVerifyError(true)
+    }
+  }
+
+  const handleDownload = () => {
+    trackDownloaded(urlPhone)
     setDownloaded(true)
   }
 
-  const missingPhone = phone === null
+  const triggerDownload = () => {
+    handleDownload()
+    window.open(config.pdfUrl, '_blank', 'noopener')
+  }
+
+  if (!verified) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
+        <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center px-6 py-16">
+          <Brand />
+
+          <form
+            onSubmit={handleVerify}
+            className="w-full rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xl shadow-slate-200/50 sm:p-10"
+          >
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/10">
+              <LockIcon className="h-8 w-8" />
+            </div>
+
+            <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">Confirm it's you</h1>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
+              For your privacy, please enter the mobile number this document was sent to before we show it.
+            </p>
+
+            <div className="mt-6 text-left">
+              <label htmlFor="phone" className="mb-1.5 block text-xs font-medium text-slate-600">
+                Mobile number
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                placeholder="98XXXXXXXX or 9198XXXXXXXX"
+                value={enteredPhone}
+                onChange={(e) => {
+                  setEnteredPhone(e.target.value)
+                  if (verifyError) setVerifyError(false)
+                }}
+                className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-2 ${
+                  verifyError
+                    ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+                    : 'border-slate-300 focus:border-slate-400 focus:ring-slate-100'
+                }`}
+              />
+              {verifyError && (
+                <p className="mt-2 text-xs font-medium text-red-600">
+                  That number doesn't match this link. Please double-check and try again.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={corePhoneDigits(enteredPhone).length !== 10}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Verify &amp; View Document
+            </button>
+          </form>
+
+          <p className="mt-8 text-center text-xs text-slate-400">
+            Having trouble? Reply to the WhatsApp message and we'll help you out.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
       <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center px-6 py-16">
-        {/* Brand */}
-        <div className="mb-8 flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white">
-            <span className="text-sm font-bold">
-              {config.companyName
-                .split(' ')
-                .map((w) => w[0])
-                .join('')
-                .slice(0, 2)}
-            </span>
-          </div>
-          <span className="text-sm font-semibold tracking-wide text-slate-700">{config.companyName}</span>
-        </div>
+        <Brand />
 
-        {!missingPhone && (
+        {!missingUrlPhone && (
           <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Delivered via WhatsApp
@@ -96,7 +195,7 @@ function App() {
             download it any time using the button below.
           </p>
 
-          {missingPhone && (
+          {missingUrlPhone && (
             <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-amber-50 p-3.5 text-left text-xs text-amber-800 ring-1 ring-amber-600/15">
               <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
@@ -117,15 +216,7 @@ function App() {
             </button>
             <button
               type="button"
-              onClick={async () => {
-                await handleDownload()
-                const link = document.createElement('a')
-                link.href = config.pdfUrl
-                link.download = config.pdfFileName
-                document.body.appendChild(link)
-                link.click()
-                link.remove()
-              }}
+              onClick={triggerDownload}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-[0.99]"
             >
               <DownloadIcon className="h-4 w-4" />

@@ -30,7 +30,7 @@ function Hero({ fromWhatsApp }) {
       )}
       <h1 className="text-[28px] leading-[1.15] font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl lg:text-brand-950">
         Your{' '}
-        <span className="bg-gradient-to-r from-gold-300 to-gold-500 bg-clip-text text-transparent lg:from-brand-600 lg:to-brand-800">
+        <span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent lg:from-brand-600 lg:to-brand-800">
           {config.documentTitle}
         </span>{' '}
         is ready
@@ -124,7 +124,8 @@ function App() {
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-16">
         <Hero fromWhatsApp={urlPhone !== null} />
 
-        <section className="animate-fade-up rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-brand-950/15 sm:p-8 lg:rounded-3xl lg:bg-white/95 lg:backdrop-blur [animation-delay:80ms]">
+        <section className="animate-fade-up relative overflow-hidden rounded-tl-[28px] rounded-tr-[28px] rounded-br-[44px] rounded-bl-[28px] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-brand-950/15 sm:p-8 lg:rounded-tl-3xl lg:rounded-tr-3xl lg:rounded-br-[56px] lg:rounded-bl-3xl lg:bg-white/95 lg:backdrop-blur [animation-delay:80ms]">
+          <span className="pointer-events-none absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-brand-700 via-accent-500 to-brand-700" aria-hidden="true" />
           <div className="mb-6 border-b border-slate-100 pb-5 sm:mb-7 sm:pb-6">
             <Stepper current={step} />
           </div>

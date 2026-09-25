@@ -4,24 +4,25 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand navy — matches the institute's certificate artwork */
-  --color-brand-50: #eef3ff;
-  --color-brand-100: #dce6ff;
-  --color-brand-200: #b9ccff;
-  --color-brand-300: #8aa8f5;
-  --color-brand-400: #5a7fe6;
-  --color-brand-500: #3659d1;
-  --color-brand-600: #2443b3;
-  --color-brand-700: #1d3590;
-  --color-brand-800: #172a6e;
-  --color-brand-900: #0f1d4d;
-  --color-brand-950: #0a1335;
+  /* Brand indigo — matches the DICS certificate's ink color */
+  --color-brand-50: #f1f0fb;
+  --color-brand-100: #e3e0f6;
+  --color-brand-200: #c7c1ed;
+  --color-brand-300: #a49bdf;
+  --color-brand-400: #8175d3;
+  --color-brand-500: #6355bf;
+  --color-brand-600: #4f42a3;
+  --color-brand-700: #423685;
+  --color-brand-800: #332a68;
+  --color-brand-900: #241f49;
+  --color-brand-950: #17132f;
 
-  /* Accent gold */
-  --color-gold-300: #fcd873;
-  --color-gold-400: #f9c740;
-  --color-gold-500: #f0ae12;
-  --color-gold-600: #cc8a06;
+  /* Accent olive-lime — matches the DICS certificate's border/footer band */
+  --color-accent-200: #dfe9ab;
+  --color-accent-300: #c9d97a;
+  --color-accent-400: #b3c95a;
+  --color-accent-500: #9ab93c;
+  --color-accent-600: #7f9c2c;
 
   --animate-fade-in: fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -54,22 +55,33 @@ body {
 /* Soft decorative background: brand glow + faint grid */
 .page-bg {
   background:
-    radial-gradient(1200px 520px at 85% -10%, rgb(54 89 209 / 0.16), transparent 60%),
-    radial-gradient(900px 480px at -10% 10%, rgb(240 174 18 / 0.12), transparent 55%),
-    linear-gradient(180deg, #f7f9fe 0%, #f2f5fb 100%);
+    radial-gradient(1200px 520px at 85% -10%, rgb(99 85 191 / 0.16), transparent 60%),
+    radial-gradient(900px 480px at -10% 10%, rgb(154 185 60 / 0.14), transparent 55%),
+    linear-gradient(180deg, #f8faf3 0%, #f3f4fb 100%);
 }
 .grid-overlay {
   background-image:
-    linear-gradient(to right, rgb(15 29 77 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(15 29 77 / 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgb(36 31 73 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(36 31 73 / 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
 }
 
+/* Diagonal-cut accent bar, echoing the DICS certificate's angled top border */
+.brand-strip {
+  background: linear-gradient(
+    100deg,
+    var(--color-brand-800) 0%,
+    var(--color-brand-600) 45%,
+    var(--color-accent-500) 78%,
+    var(--color-accent-400) 100%
+  );
+}
+
 .hero-panel {
   background:
-    radial-gradient(600px 300px at 100% 0%, rgb(240 174 18 / 0.28), transparent 60%),
-    radial-gradient(500px 400px at 0% 100%, rgb(90 127 230 / 0.35), transparent 60%),
+    radial-gradient(600px 300px at 100% 0%, rgb(154 185 60 / 0.3), transparent 60%),
+    radial-gradient(500px 400px at 0% 100%, rgb(129 117 211 / 0.4), transparent 60%),
     linear-gradient(135deg, var(--color-brand-900) 0%, var(--color-brand-700) 100%);
 }
 
@@ -143,8 +155,8 @@ body {
   animation: brand-pulse 3.2s ease-in-out infinite;
 }
 @keyframes brand-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(249 199 64 / 0); }
-  50% { box-shadow: 0 0 0 6px rgb(249 199 64 / 0.18); }
+  0%, 100% { box-shadow: 0 0 0 0 rgb(179 201 90 / 0); }
+  50% { box-shadow: 0 0 0 6px rgb(179 201 90 / 0.22); }
 }
 
 @media (prefers-reduced-motion: reduce) {

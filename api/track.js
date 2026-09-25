@@ -9,7 +9,7 @@
 // request, which blockers don't touch.
 const TRACKING_API_URL =
   process.env.TRACKING_API_URL ||
-  'https://script.google.com/macros/s/AKfycbzPGEmp-yDdmPJWOyRhs7XjEE0cOqU3Hjys0pfuZEiPHMxnXz0VKY9diXUf4TBNMZgQ/exec'
+  'https://script.google.com/macros/s/AKfycbytj2lxIgXTqhcIHafYYcIMQNhBTr3onShUoGwiF953ul1fgsnVVBDmj6Dc4IFXf_F99Q/exec'
 
 export default async function handler(req, res) {
   const { action, phone } = req.query || {}

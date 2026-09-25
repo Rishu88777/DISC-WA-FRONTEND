@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand navy — matches the institute's certificate artwork */
+  --color-brand-50: #eef3ff;
+  --color-brand-100: #dce6ff;
+  --color-brand-200: #b9ccff;
+  --color-brand-300: #8aa8f5;
+  --color-brand-400: #5a7fe6;
+  --color-brand-500: #3659d1;
+  --color-brand-600: #2443b3;
+  --color-brand-700: #1d3590;
+  --color-brand-800: #172a6e;
+  --color-brand-900: #0f1d4d;
+  --color-brand-950: #0a1335;
+
+  /* Accent gold */
+  --color-gold-300: #fcd873;
+  --color-gold-400: #f9c740;
+  --color-gold-500: #f0ae12;
+  --color-gold-600: #cc8a06;
+
+  --animate-fade-in: fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shake: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
 :root {
   color-scheme: light;
 }
@@ -7,19 +37,51 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f5f7fc;
+  color: var(--color-slate-900);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Soft decorative background: brand glow + faint grid */
+.page-bg {
+  background:
+    radial-gradient(1200px 520px at 85% -10%, rgb(54 89 209 / 0.16), transparent 60%),
+    radial-gradient(900px 480px at -10% 10%, rgb(240 174 18 / 0.12), transparent 55%),
+    linear-gradient(180deg, #f7f9fe 0%, #f2f5fb 100%);
+}
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, rgb(15 29 77 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(15 29 77 / 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+}
+
+.hero-panel {
+  background:
+    radial-gradient(600px 300px at 100% 0%, rgb(240 174 18 / 0.28), transparent 60%),
+    radial-gradient(500px 400px at 0% 100%, rgb(90 127 230 / 0.35), transparent 60%),
+    linear-gradient(135deg, var(--color-brand-900) 0%, var(--color-brand-700) 100%);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e8ecf5 0%, #f4f6fb 50%, #e8ecf5 100%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
 }
 
 /* Subtle scrollbar for the PDF preview panel */
 .pdf-scroll::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 .pdf-scroll::-webkit-scrollbar-thumb {
   background: rgba(15, 23, 42, 0.25);
@@ -40,19 +102,40 @@ body {
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes progress-indeterminate {
-  0% {
-    transform: translateX(-100%);
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-  100% {
-    transform: translateX(250%);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-progress {
-  animation: progress-indeterminate 1.1s ease-in-out infinite;
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,5 +1,6 @@
 // Handles the messy real-world shapes a WhatsApp CTA link's phone param can arrive in:
 //  - Plain digits, optionally with +91 / 91 / 0 / 0091 prefixes, spaces, dashes or brackets
+//  - Values that decode to the number repeated ("918877709208918877709208") — last 10 digits win
 //  - Base64 / base64url encoded (with or without "=" padding), e.g. "OTE4ODc3NzA5MjA4"
 //  - Base64 whose "+" got turned into a space by the query-string parser
 //  - Double-encoded (base64 of base64) or URL-encoded (%2B91…, even %252B91…) values
@@ -12,8 +13,9 @@ import { config } from '../config'
 const TEMPLATE_PLACEHOLDER_RE = /\{\{\s*[\w.]*\s*\}\}/g
 const PLAIN_PHONE_RE = /^\+?[\d\s\-().]+$/
 const BASE64_RE = /^[A-Za-z0-9+/]+={0,2}$/
+// No upper limit on purpose: only the last 10 digits are ever used, so values
+// like base64("918877709208918877709208") (number repeated) still resolve.
 const MIN_DIGITS = 10
-const MAX_DIGITS = 15 // E.164 max; only the last 10 digits are ever compared
 const MAX_DEPTH = 3
 
 function extractDigits(value) {
@@ -21,7 +23,7 @@ function extractDigits(value) {
 }
 
 function isPhoneLength(digits) {
-  return digits.length >= MIN_DIGITS && digits.length <= MAX_DIGITS
+  return digits.length >= MIN_DIGITS
 }
 
 function safeDecodeURIComponent(value) {
@@ -171,4 +173,15 @@ export function maskPhone(value) {
   const core = corePhoneDigits(value)
   if (core.length !== 10) return ''
   return `+91 ••••• •••${core.slice(-2)}`
+}
+
+/**
+ * Keeps the verification input to digits only, max 10.
+ * Typing past 10 digits is ignored; a pasted longer value (e.g. "+91 98765 43210")
+ * keeps its last 10 digits so the country code is dropped rather than the end.
+ */
+export function sanitizePhoneInput(next, prev = '') {
+  const digits = String(next).replace(/\D/g, '')
+  if (digits.length <= 10) return digits
+  return digits.length - prev.length > 1 ? digits.slice(-10) : prev
 }

@@ -10,7 +10,7 @@ import { Shell } from './components/Layout'
 import { DocumentIcon, DownloadIcon, ShieldIcon, WhatsAppIcon } from './components/Icons'
 import { triggerFileDownload } from './lib/download'
 import { config } from './config'
-import { phonesMatch } from './lib/phone'
+import { phonesMatch, sanitizePhoneInput } from './lib/phone'
 import { getPhoneFromUrl, trackDownloaded, trackOpened } from './lib/tracking'
 
 const FEATURES = [
@@ -144,7 +144,7 @@ function App() {
             <VerifyCard
               value={enteredPhone}
               onChange={(v) => {
-                setEnteredPhone(v)
+                setEnteredPhone((prev) => sanitizePhoneInput(v, prev))
                 if (verifyError) setVerifyError(false)
               }}
               onSubmit={handleVerify}

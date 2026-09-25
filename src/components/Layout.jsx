@@ -4,7 +4,7 @@ import { CapIcon, GlobeIcon, MailIcon, PhoneIcon, ShieldIcon } from './Icons'
 export function BrandMark({ className = 'h-11 w-11' }) {
   return (
     <div
-      className={`relative flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-800 to-brand-950 text-gold-400 shadow-lg shadow-brand-900/25 ring-1 ring-white/10 ${className}`}
+      className={`brand-glow relative flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-800 to-brand-950 text-gold-400 shadow-lg shadow-brand-900/25 ring-1 ring-white/10 ${className}`}
     >
       <CapIcon className="h-[55%] w-[55%]" />
     </div>
@@ -18,7 +18,7 @@ export function Header() {
         <div className="flex min-w-0 items-center gap-3">
           <BrandMark className="h-10 w-10 ring-white/20 sm:h-11 sm:w-11 max-lg:bg-white/10 max-lg:from-white/15 max-lg:to-white/5 max-lg:shadow-none" />
           <div className="min-w-0 leading-tight">
-            <p className="truncate text-[15px] font-bold tracking-tight text-white sm:text-base lg:text-brand-950">
+            <p className="animate-shine truncate bg-gradient-to-r from-white via-gold-200 to-white bg-[length:200%_100%] bg-clip-text text-[15px] font-bold tracking-tight text-transparent sm:text-base lg:from-brand-700 lg:via-gold-500 lg:to-brand-900">
               {config.companyName}
             </p>
             {config.companyTagline && (

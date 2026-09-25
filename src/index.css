@@ -28,6 +28,7 @@
   --animate-shake: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   --animate-shimmer: shimmer 1.6s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-shine: shine 3.2s ease-in-out infinite;
 }
 
 :root {
@@ -128,6 +129,22 @@ body {
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+
+/* Animated gradient sweep for the brand name text */
+@keyframes shine {
+  0% { background-position: 200% 0; }
+  55% { background-position: -200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Soft pulsing glow ring behind the brand mark */
+.brand-glow {
+  animation: brand-pulse 3.2s ease-in-out infinite;
+}
+@keyframes brand-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(249 199 64 / 0); }
+  50% { box-shadow: 0 0 0 6px rgb(249 199 64 / 0.18); }
 }
 
 @media (prefers-reduced-motion: reduce) {

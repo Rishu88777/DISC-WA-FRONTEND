@@ -23,7 +23,7 @@ src/
     pdf.js               Lazy pdf.js loader (legacy build, for older WebViews)
   config.js               Tracking URL, PDF, branding and contact details
 public/
-  School_Report.pdf       The PDF that's previewed and downloaded
+  DICS_Admission_Notice.pdf  The PDF that's previewed and downloaded
 google-apps-script/
   Code.gs                  Paste into Apps Script; writes to the Sheet
 ```
@@ -138,7 +138,7 @@ Whatever the input, the Sheet always receives the canonical `91XXXXXXXXXX` form.
 - The PDF is rendered to `<canvas>` with pdf.js (legacy build, so it also works
   in older Android WebViews used by WhatsApp's in-app browser). The Download
   button always works regardless of whether the preview renders.
-- To swap the PDF: replace `public/School_Report.pdf` (or change `pdfUrl` /
+- To swap the PDF: replace `public/DICS_Admission_Notice.pdf` (or change `pdfUrl` /
   `pdfFileName` in `src/config.js`) and update the path in `vercel.json`.
 - Both the modal's Download button and the landing page's own Download
   button share the same `handleDownload` tracking call, so either path is

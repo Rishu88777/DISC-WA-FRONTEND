@@ -1,11 +1,11 @@
 {
   "headers": [
     {
-      "source": "/School_Report.pdf",
+      "source": "/DICS_Admission_Notice.pdf",
       "headers": [
         {
           "key": "Content-Disposition",
-          "value": "attachment; filename=\"School_Report.pdf\""
+          "value": "attachment; filename=\"DICS_Admission_Notice.pdf\""
         }
       ]
     }

@@ -1,5 +1,5 @@
 import { config } from '../config'
-import { decodeRawPhoneParam, toCanonicalPhone } from './phone'
+import { extractPhone, toCanonicalPhone } from './phone'
 
 function buildUrl(action, phone) {
   const url = new URL(config.trackingApiUrl)
@@ -52,18 +52,54 @@ export function trackDownloaded(phone) {
   sendBeacon('download', phone)
 }
 
+// Params that are never the phone number — ad-click IDs etc. are long random
+// strings that could otherwise be mis-read by the fallback scan below.
+const IGNORED_PARAM_RE = /^(utm_.*|fbclid|gclid|gbraid|wbraid|ctwa_clid|msclkid|igshid|ref_src|t|v|lang)$/i
+
+function parseParams(source) {
+  const trimmed = (source || '').replace(/^[?#/]+/, '')
+  return trimmed ? [...new URLSearchParams(trimmed)] : []
+}
+
 /**
- * Reads the recipient's phone number from the current URL's query string,
- * decoding base64/placeholder-junk as needed, and returns it in the canonical
- * "91XXXXXXXXXX" form (or null if none could be found).
+ * Reads the recipient's phone number from the current URL and returns it in the
+ * canonical "91XXXXXXXXXX" form (or null if none could be found).
+ *
+ * Accepts plain or base64/base64url values (see lib/phone.js), and looks in, in order:
+ *  1. Known param names in the query string or hash — ?phone=…, ?Mobile=…, #phone=…
+ *  2. Any other query/hash param value or bare key — ?data=<base64>, ?OTE4ODc3…
+ *  3. The last path segment — /918877709208 or /OTE4ODc3NzA5MjA4
  */
 export function getPhoneFromUrl() {
-  const params = new URLSearchParams(window.location.search)
-  for (const name of config.phoneParamNames) {
-    const raw = params.get(name)
-    if (!raw) continue
-    const canonical = toCanonicalPhone(decodeRawPhoneParam(raw))
-    if (canonical) return canonical
+  const { search, hash, pathname } = window.location
+  const params = [...parseParams(search), ...parseParams(hash)]
+  const knownNames = new Set(config.phoneParamNames.map((n) => n.toLowerCase()))
+  const toResult = (raw) => toCanonicalPhone(extractPhone(raw)) || null
+
+  for (const [key, value] of params) {
+    if (!knownNames.has(key.toLowerCase())) continue
+    const phone = toResult(value)
+    if (phone) return phone
   }
+
+  for (const [key, value] of params) {
+    if (knownNames.has(key.toLowerCase()) || IGNORED_PARAM_RE.test(key)) continue
+    const phone = toResult(value) || (value === '' ? toResult(key) : null)
+    if (phone) return phone
+  }
+
+  // A bare base64 query like "?OTE4ODc3NzA5MjA4==" parses into a key ending in "=".
+  const bareQuery = search.replace(/^\?/, '')
+  if (bareQuery && !bareQuery.includes('&')) {
+    const phone = toResult(bareQuery)
+    if (phone) return phone
+  }
+
+  const lastSegment = pathname.split('/').filter(Boolean).pop()
+  if (lastSegment && !lastSegment.includes('.')) {
+    const phone = toResult(lastSegment)
+    if (phone) return phone
+  }
+
   return null
 }

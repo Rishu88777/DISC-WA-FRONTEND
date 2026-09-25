@@ -13,12 +13,17 @@ the link (which carries their phone number as a query param), this page:
 src/
   App.jsx              Landing page (hero, view/download buttons)
   components/
-    PdfModal.jsx        The PDF preview modal + download bar
+    Layout.jsx          Header / footer / page shell
+    VerifyCard.jsx      Phone-number verification step
+    DocumentCard.jsx    Document summary with live first-page thumbnail
+    PdfModal.jsx        Full-screen PDF viewer (zoom, pages) + download bar
   lib/
-    tracking.js          Fires the Opened/Downloaded beacons
-  config.js               Reads all the .env values
+    tracking.js          Fires the Opened/Downloaded beacons, reads the phone from the URL
+    phone.js             Decodes plain / base64 / messy phone values
+    pdf.js               Lazy pdf.js loader (legacy build, for older WebViews)
+  config.js               Tracking URL, PDF, branding and contact details
 public/
-  sample-document.pdf     Placeholder PDF — replace with your real file
+  School_Report.pdf       The PDF that's previewed and downloaded
 google-apps-script/
   Code.gs                  Paste into Apps Script; writes to the Sheet
 ```
@@ -95,8 +100,19 @@ https://your-domain.com/?phone={{1}}
 ```
 
 where `{{1}}` is the template variable WhatsApp fills in with the recipient's
-number when the message is sent. The page also accepts `number`, `mobile`, or
-`wa_number` as the param name if that's easier on your sending platform.
+number when the message is sent.
+
+The phone value can be sent **plain or base64-encoded** — the page handles all of these
+(see `src/lib/phone.js`):
+
+- `?phone=918877709208`, `?phone=8877709208`, `?phone=+91 88777-09208`, `?phone=08877709208`
+- `?phone=OTE4ODc3NzA5MjA4` (base64 / base64url, with or without `=` padding, double-encoded too)
+- base64 of a payload like `phone=9188…` or `{"phone":"9188…"}`
+- a stray unfilled `{{1}}` placeholder, URL-encoded values (`%2B91…`)
+- other param names (`number`, `mobile`, `wa_number`, `whatsapp`, … — case-insensitive),
+  any other param (`?data=<base64>`), a bare `?<base64>`, `#phone=…`, or a path like `/918877709208`
+
+Whatever the input, the Sheet always receives the canonical `91XXXXXXXXXX` form.
 
 ## How tracking works
 
@@ -119,11 +135,11 @@ number when the message is sent. The page also accepts `number`, `mobile`, or
 
 ## Notes / things you may want to adjust
 
-- The PDF is embedded via `<iframe src="...pdf">`, which uses the visitor's
-  browser's built-in PDF viewer. This works well in desktop Chrome/Safari/Edge
-  and in Android's WhatsApp in-app browser; iOS in-app browsers can sometimes
-  render PDFs inconsistently — the modal includes a fallback line and the
-  Download button always works regardless of whether the preview renders.
+- The PDF is rendered to `<canvas>` with pdf.js (legacy build, so it also works
+  in older Android WebViews used by WhatsApp's in-app browser). The Download
+  button always works regardless of whether the preview renders.
+- To swap the PDF: replace `public/School_Report.pdf` (or change `pdfUrl` /
+  `pdfFileName` in `src/config.js`) and update the path in `vercel.json`.
 - Both the modal's Download button and the landing page's own Download
   button share the same `handleDownload` tracking call, so either path is
   logged.

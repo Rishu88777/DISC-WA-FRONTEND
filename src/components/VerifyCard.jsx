@@ -52,9 +52,9 @@ export default function VerifyCard({ value, onChange, onSubmit, error, hintPhone
           id="phone"
           type="tel"
           inputMode="numeric"
-          autoComplete="tel-national"
+          autoComplete="off"
           placeholder="98765 43210"
-          maxLength={20}
+          pattern="[0-9]{10}"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error || undefined}
@@ -68,7 +68,7 @@ export default function VerifyCard({ value, onChange, onSubmit, error, hintPhone
         </span>
       </div>
 
-      <p className="mt-2 text-xs text-slate-400">You can include the country code, e.g. +91 or 0.</p>
+      <p className="mt-2 text-xs text-slate-400">Enter your 10-digit mobile number — numbers only.</p>
 
       <button
         type="submit"

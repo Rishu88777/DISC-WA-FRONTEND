@@ -6,12 +6,6 @@
 const env = import.meta.env
 
 export const config = {
-  // Google Apps Script "Web App" URL that logs Opened / Downloaded events to Google Sheets.
-  // See google-apps-script/Code.gs for the script and README.md for deployment steps.
-  trackingApiUrl:
-    env.VITE_TRACKING_API_URL ||
-    'https://script.google.com/macros/s/AKfycbzPGEmp-yDdmPJWOyRhs7XjEE0cOqU3Hjys0pfuZEiPHMxnXz0VKY9diXUf4TBNMZgQ/exec',
-
   // The PDF that gets previewed and downloaded. Lives in /public.
   pdfUrl: env.VITE_PDF_URL || '/School_Report.pdf',
   pdfFileName: env.VITE_PDF_FILE_NAME || 'School_Report.pdf',

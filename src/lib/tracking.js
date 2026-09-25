@@ -1,8 +1,13 @@
 import { config } from '../config'
 import { extractPhone, toCanonicalPhone } from './phone'
 
+// Routed through our own /api/track (same-origin) instead of calling
+// script.google.com directly from the browser — tracker/ad blockers (Brave
+// Shields, uBlock Origin, Firefox strict tracking protection) flag Apps
+// Script /exec URLs as tracker-like and silently drop the request, so a
+// same-origin proxy is what actually makes this reliable for real visitors.
 function buildUrl(action, phone) {
-  const url = new URL(config.trackingApiUrl)
+  const url = new URL('/api/track', window.location.origin)
   url.searchParams.set('action', action)
   url.searchParams.set('phone', phone)
   url.searchParams.set('t', Date.now().toString())
@@ -10,23 +15,15 @@ function buildUrl(action, phone) {
 }
 
 /**
- * Fires a best-effort tracking beacon to the Google Apps Script Web App.
+ * Fires a best-effort tracking beacon to our /api/track proxy.
  *
  * Prefers `navigator.sendBeacon`: it queues the request with the browser itself,
  * so it still reaches the server even if this call happens right before the page
  * navigates away (e.g. WhatsApp's in-app WebView handing the download off to the
  * system browser). Falls back to a fire-and-forget fetch where sendBeacon isn't
- * available. Either way we use `no-cors`/beacon semantics on purpose: Apps Script
- * doesn't reliably return CORS headers and we don't need to read the response.
+ * available.
  */
 function sendBeacon(action, phone) {
-  if (!config.trackingApiUrl) {
-    console.warn(
-      `[tracking] VITE_TRACKING_API_URL is not set — skipping "${action}" event for ${phone}.`,
-    )
-    return
-  }
-
   if (!phone) {
     console.warn(`[tracking] No phone number found in the URL — skipping "${action}" event.`)
     return
@@ -39,8 +36,8 @@ function sendBeacon(action, phone) {
     if (queued) return
   }
 
-  fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store', keepalive: true }).catch(
-    (error) => console.error(`[tracking] Failed to send "${action}" event:`, error),
+  fetch(url, { method: 'GET', cache: 'no-store', keepalive: true }).catch((error) =>
+    console.error(`[tracking] Failed to send "${action}" event:`, error),
   )
 }
 

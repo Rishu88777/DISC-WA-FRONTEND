@@ -54,7 +54,7 @@ export default function VerifyCard({ value, onChange, onSubmit, error, hintPhone
           inputMode="numeric"
           autoComplete="tel-national"
           placeholder="98765 43210"
-          maxLength={16}
+          maxLength={20}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error || undefined}
@@ -67,6 +67,8 @@ export default function VerifyCard({ value, onChange, onSubmit, error, hintPhone
           {Math.min(digits.length, 10)}/10
         </span>
       </div>
+
+      <p className="mt-2 text-xs text-slate-400">You can include the country code, e.g. +91 or 0.</p>
 
       <button
         type="submit"

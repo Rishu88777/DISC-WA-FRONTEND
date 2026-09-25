@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { formatBytes } from '../lib/pdf'
 import { maskPhone } from '../lib/phone'
 import PdfThumbnail from './PdfThumbnail'
-import { AlertIcon, CheckIcon, DownloadIcon, EyeIcon, ShieldIcon } from './Icons'
+import { CheckIcon, DownloadIcon, EyeIcon, ShieldIcon } from './Icons'
 
 export default function DocumentCard({ pdfUrl, fileName, title, subtitle, phone, downloaded, onView, onDownload }) {
   const [meta, setMeta] = useState(null)
@@ -48,19 +48,11 @@ export default function DocumentCard({ pdfUrl, fileName, title, subtitle, phone,
         ))}
       </div>
 
-      {masked ? (
+      {masked && (
         <div className="mt-5 flex items-center gap-2.5 rounded-xl bg-emerald-50 px-3.5 py-3 text-xs font-medium text-emerald-800 ring-1 ring-emerald-600/15">
           <ShieldIcon className="h-4 w-4 shrink-0 text-emerald-600" />
           <span>
             Verified for <span className="font-bold">{masked}</span>
-          </span>
-        </div>
-      ) : (
-        <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-amber-50 p-3.5 text-left text-xs text-amber-800 ring-1 ring-amber-600/15">
-          <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>
-            This link is missing a recipient reference, so this visit won't be recorded. The document still works
-            normally.
           </span>
         </div>
       )}

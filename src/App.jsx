@@ -23,24 +23,27 @@ function Hero({ fromWhatsApp }) {
   return (
     <div className="animate-fade-up lg:pt-6">
       {fromWhatsApp && (
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm ring-1 ring-emerald-600/15">
-          <WhatsAppIcon className="h-4 w-4 text-emerald-500" />
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/15 lg:mb-5 lg:bg-white lg:text-emerald-700 lg:shadow-sm lg:ring-emerald-600/15">
+          <WhatsAppIcon className="h-4 w-4 text-emerald-400 lg:text-emerald-500" />
           Delivered via WhatsApp
         </div>
       )}
-      <h1 className="text-3xl leading-[1.1] font-extrabold tracking-tight text-brand-950 sm:text-4xl lg:text-5xl">
+      <h1 className="text-[28px] leading-[1.15] font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl lg:text-brand-950">
         Your{' '}
-        <span className="bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-gold-300 to-gold-500 bg-clip-text text-transparent lg:from-brand-600 lg:to-brand-800">
           {config.documentTitle}
         </span>{' '}
         is ready
       </h1>
-      <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-600 sm:text-lg">
+      <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/70 lg:hidden">
+        Issued by {config.companyName}. View it securely or save a copy to your phone.
+      </p>
+      <p className="mt-4 hidden max-w-lg text-lg leading-relaxed text-slate-600 lg:block">
         {config.documentSubtitle}, issued by {config.companyName}. View it securely below or save a copy to your
         device.
       </p>
 
-      <ul className="mt-8 hidden gap-4 sm:grid">
+      <ul className="mt-8 hidden gap-4 lg:grid">
         {FEATURES.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-start gap-4">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-brand-700 shadow-sm ring-1 ring-slate-200">
@@ -59,8 +62,9 @@ function Hero({ fromWhatsApp }) {
 
 function App() {
   const [urlPhone] = useState(() => getPhoneFromUrl())
-  // No phone to verify against — there's nothing to gate, so start unlocked.
-  const [verified, setVerified] = useState(() => urlPhone === null)
+  // Always start locked: the document is only shown once the visitor enters a
+  // number whose last 10 digits match the (plain or base64) number in the link.
+  const [verified, setVerified] = useState(false)
   const [enteredPhone, setEnteredPhone] = useState('')
   const [verifyError, setVerifyError] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
@@ -90,7 +94,7 @@ function App() {
 
   const handleVerify = (e) => {
     e.preventDefault()
-    if (phonesMatch(enteredPhone, urlPhone)) {
+    if (urlPhone && phonesMatch(enteredPhone, urlPhone)) {
       setVerifyError(false)
       setVerified(true)
     } else {
@@ -117,11 +121,11 @@ function App() {
 
   return (
     <Shell>
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-16">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-16">
         <Hero fromWhatsApp={urlPhone !== null} />
 
-        <section className="animate-fade-up rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-2xl shadow-brand-900/10 backdrop-blur sm:p-8 [animation-delay:80ms]">
-          <div className="mb-7 border-b border-slate-100 pb-6">
+        <section className="animate-fade-up rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-2xl shadow-brand-950/15 sm:p-8 lg:rounded-3xl lg:bg-white/95 lg:backdrop-blur [animation-delay:80ms]">
+          <div className="mb-6 border-b border-slate-100 pb-5 sm:mb-7 sm:pb-6">
             <Stepper current={step} />
           </div>
 
@@ -158,12 +162,16 @@ function App() {
       <ErrorDialog
         open={verifyError}
         title="That number doesn't match"
-        message="The mobile number you entered doesn't match the recipient of this link. Please double-check and try again."
+        message={
+          urlPhone
+            ? "The mobile number you entered doesn't match the recipient of this link. Please double-check and try again."
+            : "This link doesn't contain a valid recipient number, so we can't verify it. Please open the link exactly as it was sent to you on WhatsApp."
+        }
         onClose={closeError}
       />
 
       <PdfModal
-        open={modalOpen}
+        open={verified && modalOpen}
         onClose={closeModal}
         pdfUrl={config.pdfUrl}
         fileName={config.pdfFileName}

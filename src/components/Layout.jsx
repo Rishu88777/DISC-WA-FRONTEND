@@ -13,22 +13,23 @@ export function BrandMark({ className = 'h-11 w-11' }) {
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
+    <header className="relative z-30 pt-[env(safe-area-inset-top)] lg:sticky lg:top-0 lg:border-b lg:border-slate-200/70 lg:bg-white/80 lg:backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:h-[72px] sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <BrandMark className="h-10 w-10 sm:h-11 sm:w-11" />
+          <BrandMark className="h-10 w-10 ring-white/20 sm:h-11 sm:w-11 max-lg:bg-white/10 max-lg:from-white/15 max-lg:to-white/5 max-lg:shadow-none" />
           <div className="min-w-0 leading-tight">
-            <p className="truncate text-[15px] font-bold tracking-tight text-brand-950 sm:text-base">
+            <p className="truncate text-[15px] font-bold tracking-tight text-white sm:text-base lg:text-brand-950">
               {config.companyName}
             </p>
             {config.companyTagline && (
-              <p className="truncate text-xs font-medium text-slate-500">{config.companyTagline}</p>
+              <p className="truncate text-xs font-medium text-white/60 lg:text-slate-500">{config.companyTagline}</p>
             )}
           </div>
         </div>
-        <div className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-600/15 sm:flex">
+        <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 max-[379px]:hidden px-2.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/15 lg:bg-emerald-50 lg:px-3 lg:text-xs lg:text-emerald-700 lg:ring-emerald-600/15">
           <ShieldIcon className="h-4 w-4" />
-          Secure document portal
+          <span className="max-sm:hidden">Secure document portal</span>
+          <span className="sm:hidden">Secure</span>
         </div>
       </div>
     </header>
@@ -51,7 +52,7 @@ export function Footer() {
   ].filter(Boolean)
 
   return (
-    <footer className="mt-auto border-t border-slate-200/70 bg-white/60 backdrop-blur">
+    <footer className="mt-auto border-t border-slate-200/70 bg-white/60 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-4 px-4 py-6 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left">
         <p className="text-xs text-slate-500">
           © {new Date().getFullYear()} {config.companyName}. All rights reserved.
@@ -81,9 +82,14 @@ export function Footer() {
 export function Shell({ children }) {
   return (
     <div className="page-bg relative flex min-h-screen flex-col text-slate-900">
-      <div className="grid-overlay pointer-events-none absolute inset-x-0 top-0 h-[520px]" aria-hidden="true" />
+      {/* Mobile / WhatsApp WebView: a navy "app bar" band the card overlaps */}
+      <div
+        className="hero-panel pointer-events-none absolute inset-x-0 top-0 h-[340px] rounded-b-[36px] sm:h-[380px] lg:hidden"
+        aria-hidden="true"
+      />
+      <div className="grid-overlay pointer-events-none absolute inset-x-0 top-0 h-[520px] max-lg:hidden" aria-hidden="true" />
       <Header />
-      <main className="relative mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
+      <main className="relative mx-auto w-full max-w-6xl flex-1 px-4 pt-3 pb-8 sm:px-6 sm:pt-8 sm:pb-12 lg:py-16">
         {children}
       </main>
       <Footer />

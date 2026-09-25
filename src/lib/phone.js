@@ -13,7 +13,7 @@ const TEMPLATE_PLACEHOLDER_RE = /\{\{\s*[\w.]*\s*\}\}/g
 const PLAIN_PHONE_RE = /^\+?[\d\s\-().]+$/
 const BASE64_RE = /^[A-Za-z0-9+/]+={0,2}$/
 const MIN_DIGITS = 10
-const MAX_DIGITS = 14 // e.g. 0091XXXXXXXXXX
+const MAX_DIGITS = 15 // E.164 max; only the last 10 digits are ever compared
 const MAX_DEPTH = 3
 
 function extractDigits(value) {
